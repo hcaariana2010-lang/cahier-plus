@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cahier+ — Chatbot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#F7F5EF; --paper-line:#C7D3EA; --ink:#1F2A44; --ink-soft:#4A5573;
+    --marge:#D64550; --surligneur:#FFD23F; --vert:#4C9A6A;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  * { box-sizing:border-box; }
+  html, body { height:100%; }
+  body { margin:0; background:var(--paper);
+    background-image:repeating-linear-gradient(to bottom, transparent, transparent 35px, var(--paper-line) 35px, var(--paper-line) 36px);
+    color:var(--ink); font-family:'Work Sans',system-ui,sans-serif; line-height:1.55;
+    display:flex; flex-direction:column; }
+  .marge { position:fixed; top:0; bottom:0; left:64px; width:2px; background:var(--marge); opacity:.55; z-index:0; }
+  header, .wrap { position:relative; z-index:1; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:24px 32px 20px 96px; max-width:1100px; margin:0 auto; width:100%; }
+  .logo { font-family:'Kalam',cursive; font-weight:700; font-size:1.5rem; }
+  .logo span { color:var(--marge); }
+  nav a { color:var(--ink-soft); text-decoration:none; margin-left:24px; font-size:.95rem; font-weight:500; }
+
+  .wrap { max-width:720px; margin:0 auto; padding:0 32px 24px 96px; flex:1; display:flex; flex-direction:column; width:100%; }
+  .contexte { font-size:.85rem; color:var(--ink-soft); margin-bottom:16px; }
+  .contexte strong { color:var(--ink); }
+
+  .chat { flex:1; display:flex; flex-direction:column; gap:14px; overflow-y:auto; padding-bottom:16px; }
+  .msg { max-width:80%; padding:12px 16px; border-radius:6px; font-size:.96rem; }
+  .msg.bot { background:#fff; border:1.5px solid var(--paper-line); align-self:flex-start; border-bottom-left-radius:2px; }
+  .msg.moi { background:var(--ink); color:var(--paper); align-self:flex-end; border-bottom-right-radius:2px; }
+  .msg.bot strong { color: var(--marge); }
+
+  form { display:flex; gap:10px; padding-top:12px; border-top:1.5px dashed var(--paper-line); }
+  input[type="text"] {
+    flex:1; font-family:'Work Sans',sans-serif; font-size:1rem; padding:12px 16px;
+    border:1.5px solid var(--ink); border-radius:4px; background:#fff; color:var(--ink);
+  }
+  input[type="text"]:focus { outline:2px solid var(--marge); outline-offset:1px; }
+  button.envoyer {
+    background:var(--ink); color:var(--paper); border:none; font-weight:600;
+    padding:0 22px; border-radius:4px; cursor:pointer; font-family:'Work Sans',sans-serif; font-size:.98rem;
+  }
+  button.envoyer:hover { background:var(--ink-soft); }
+
+  @media (max-width:640px) {
+    .marge { left:20px; } header { padding:20px 20px 16px 44px; flex-direction:column; align-items:flex-start; gap:10px; }
+    .wrap { padding:0 20px 16px 44px; }
+    .msg { max-width:90%; }
+  }
+</style>
+</head>
+<body>
+  <div class="marge" aria-hidden="true"></div>
+  <header>
+    <div class="logo"><a href="index.html" style="color:inherit;text-decoration:none;">Cahier<span>+</span></a></div>
+    <nav>
+      <a href="tableau-de-bord.html">Mon tableau de bord</a>
+      <a href="mon-cours.html">Mon cours</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="contexte">Tu discutes à propos de <strong>La guerre froide</strong> — Histoire-Géo, Terminale</div>
+
+    <div class="chat" id="chat">
+      <div class="msg bot"><strong>Assistant</strong><br>Salut ! Je connais ton cours sur la guerre froide. Pose-moi une question sur ce qui te bloque.</div>
+      <div class="msg moi">C'est quoi la différence entre la doctrine Truman et le plan Marshall ?</div>
+      <div class="msg bot"><strong>Assistant</strong><br>Bonne question, les deux sont liés mais différents : la doctrine Truman (1947) est l'engagement politique et militaire des États-Unis à soutenir tout pays menacé par le communisme. Le plan Marshall (1947 aussi) en est le volet économique : une aide financière massive à la reconstruction de l'Europe de l'Ouest, pour l'éloigner de l'influence soviétique.</div>
+    </div>
+
+    <form id="form">
+      <input type="text" id="input" placeholder="Écris ta question..." aria-label="Ta question">
+      <button type="submit" class="envoyer">Envoyer</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const chat = document.getElementById('chat');
+    const contexteEl = document.querySelector('.contexte');
+
+    // Récupère le cours généré précédemment (déposé par ajouter-cours.html), sinon contexte par défaut
+    const coursStocke = JSON.parse(sessionStorage.getItem('coursGenere') || 'null');
+    const contexteCours = coursStocke ? coursStocke.texteCours : "La guerre froide (Histoire-Géo, Terminale) : affrontement indirect entre les États-Unis et l'URSS de 1947 à 1991.";
+    if (coursStocke) {
+      contexteEl.innerHTML = `Tu discutes à propos de <strong>${coursStocke.matiere || 'ton cours'}</strong> — ${coursStocke.niveau || ''}`;
+    }
+
+    // Historique envoyé à l'API (format attendu par Claude : role/content)
+    let historique = [];
+
+    function ajouterMessage(role, texte) {
+      const msg = document.createElement('div');
+      msg.className = 'msg ' + (role === 'user' ? 'moi' : 'bot');
+      msg.innerHTML = role === 'user' ? texte : `<strong>Assistant</strong><br>${texte}`;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+      return msg;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const texte = input.value.trim();
+      if (!texte) return;
+
+      ajouterMessage('user', texte);
+      historique.push({ role: 'user', content: texte });
+      input.value = '';
+      input.disabled = true;
+
+      const msgAttente = ajouterMessage('assistant', '...');
+
+      try {
+        const reponse = await fetch('/api/chatbot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contexteCours,
+            historique: historique.slice(0, -1), // sans le dernier message, envoyé séparément
+            question: texte,
+          }),
+        });
+        const resultat = await reponse.json();
+
+        if (!reponse.ok) throw new Error(resultat.erreur || 'Erreur inconnue');
+
+        msgAttente.innerHTML = `<strong>Assistant</strong><br>${resultat.reponse}`;
+        historique.push({ role: 'assistant', content: resultat.reponse });
+      } catch (erreur) {
+        console.error(erreur);
+        msgAttente.innerHTML = `<strong>Assistant</strong><br>Désolé, une erreur est survenue. Réessaie.`;
+      } finally {
+        input.disabled = false;
+        input.focus();
+        chat.scrollTop = chat.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>

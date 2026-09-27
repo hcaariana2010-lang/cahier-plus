@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cahier+ — Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F7F5EF; --paper-line: #C7D3EA; --ink: #1F2A44; --ink-soft: #4A5573;
+    --marge: #D64550; --surligneur: #FFD23F; --vert: #4C9A6A;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; background: var(--paper);
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 35px, var(--paper-line) 35px, var(--paper-line) 36px);
+    color: var(--ink); font-family: 'Work Sans', system-ui, sans-serif; line-height: 1.55;
+  }
+  .marge { position: fixed; top:0; bottom:0; left:64px; width:2px; background:var(--marge); opacity:.55; z-index:0; }
+  header, main, footer { position: relative; z-index: 1; }
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 28px 32px 28px 96px; max-width:1100px; margin:0 auto;
+  }
+  .logo { font-family:'Kalam',cursive; font-weight:700; font-size:1.5rem; }
+  .logo span { color: var(--marge); }
+  nav a { color: var(--ink-soft); text-decoration:none; margin-left:24px; font-size:.95rem; font-weight:500; }
+  nav a:hover, nav a:focus-visible { color: var(--ink); }
+
+  main { max-width: 700px; margin: 0 auto; padding: 8px 32px 90px 96px; }
+
+  .fil { font-size: .85rem; color: var(--ink-soft); margin-bottom: 6px; }
+  h1 { font-family:'Kalam',cursive; font-weight:700; font-size: clamp(1.9rem, 4vw, 2.4rem); margin: 0 0 6px; }
+  .progress-wrap { display:flex; align-items:center; gap:12px; margin: 20px 0 36px; }
+  .progress-bar { flex:1; height: 8px; background: #fff; border: 1.5px solid var(--paper-line); border-radius: 6px; overflow:hidden; }
+  .progress-fill { height:100%; background: var(--surligneur); width: 20%; transition: width .3s ease; }
+  .progress-label { font-size: .85rem; color: var(--ink-soft); white-space:nowrap; }
+
+  .question-card {
+    background: #fff; border: 1.5px solid var(--paper-line); border-radius: 6px;
+    padding: 28px 26px; margin-bottom: 20px;
+  }
+  .q-num { font-family:'Kalam',cursive; color: var(--marge); font-size: 1rem; margin-bottom: 8px; }
+  .q-text { font-size: 1.15rem; font-weight: 600; margin: 0 0 22px; }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display:flex; align-items:center; gap: 12px;
+    border: 1.5px solid var(--paper-line); border-radius: 4px;
+    padding: 13px 16px; cursor: pointer; font-size: .98rem;
+  }
+  .option:hover, .option:focus-within { border-color: var(--ink); }
+  .option input { accent-color: var(--marge); }
+  .option.correcte { border-color: var(--vert); background: #F1F8F3; }
+  .option.incorrecte { border-color: var(--marge); background: #FCEEEF; }
+
+  .explication {
+    display: none; margin-top: 18px; padding: 14px 16px;
+    background: #FFF8ED; border-left: 3px solid var(--surligneur);
+    font-size: .92rem; color: var(--ink-soft); border-radius: 2px;
+  }
+  .explication.show { display: block; }
+
+  .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .cta {
+    background: var(--ink); color: var(--paper); font-weight: 600;
+    padding: 12px 26px; border-radius: 4px; border: none; cursor: pointer;
+    font-family: 'Work Sans', sans-serif; font-size: .98rem;
+  }
+  .cta:hover, .cta:focus-visible { background: var(--ink-soft); }
+  .cta[disabled] { opacity: .45; cursor: not-allowed; }
+  .lien-chatbot { font-size: .9rem; color: var(--ink-soft); text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .marge { left: 20px; }
+    header { padding: 24px 20px 24px 44px; flex-direction: column; align-items:flex-start; gap:12px; }
+    main { padding: 8px 20px 70px 44px; }
+    .question-card { padding: 22px 18px; }
+  }
+</style>
+</head>
+<body>
+  <div class="marge" aria-hidden="true"></div>
+
+  <header>
+    <div class="logo"><a href="index.html" style="color:inherit;text-decoration:none;">Cahier<span>+</span></a></div>
+    <nav>
+      <a href="ajouter-cours.html">Mes cours</a>
+      <a href="#">Chatbot</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="fil">Histoire-Géo · Terminale</div>
+    <div class="fil" id="fil">Histoire-Géo · Terminale</div>
+    <h1 id="titre">La guerre froide — Quiz</h1>
+
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+      <div class="progress-label" id="label">Question 1 / 5</div>
+    </div>
+
+    <div class="question-card" id="carte-question">
+      <div class="q-num" id="q-num">Question 1</div>
+      <p class="q-text" id="q-text">Quel événement marque symboliquement le début de la guerre froide en Europe ?</p>
+      <div class="options" id="options"></div>
+      <div class="explication" id="explication"></div>
+    </div>
+
+    <div class="actions">
+      <button class="cta" id="valider">Valider ma réponse</button>
+      <a href="chatbot.html" class="lien-chatbot">Une question ? Demande au chatbot →</a>
+    </div>
+  </main>
+
+  <script>
+    const quizParDefaut = [
+      { question: "Quel événement marque symboliquement le début de la guerre froide en Europe ?", options: ["Le blocus de Berlin (1948)", "La chute du mur de Berlin (1989)", "Le discours de Fulton de Churchill (1946)", "La crise de Cuba (1962)"], bonneReponse: 2, explication: "Le discours de Fulton, où Churchill évoque un « rideau de fer », est généralement retenu comme le moment où la rupture entre blocs devient publique et officielle." },
+      { question: "Que vise principalement le plan Marshall (1947) ?", options: ["Envoyer des troupes en Europe", "Reconstruire économiquement l'Europe de l'Ouest", "Créer l'ONU", "Négocier avec Staline"], bonneReponse: 1, explication: "Le plan Marshall est une aide économique massive des États-Unis pour reconstruire l'Europe de l'Ouest et l'éloigner de l'influence soviétique." },
+      { question: "Quelle crise rapproche le plus le monde d'un conflit nucléaire direct ?", options: ["Le blocus de Berlin", "La guerre de Corée", "La crise des missiles de Cuba (1962)", "La construction du mur de Berlin"], bonneReponse: 2, explication: "En 1962, la découverte de missiles soviétiques à Cuba pousse le monde au bord de la guerre nucléaire, avant un accord entre Kennedy et Khrouchtchev." },
+      { question: "Qu'est-ce que la doctrine Truman (1947) ?", options: ["Un traité de paix avec l'URSS", "L'engagement des États-Unis à soutenir tout pays menacé par le communisme", "La création du bloc de l'Est", "Un accord commercial"], bonneReponse: 1, explication: "La doctrine Truman formalise le containment : les États-Unis s'engagent à aider tout pays menacé par l'expansion communiste." },
+      { question: "Quel événement précède de peu la dissolution de l'URSS ?", options: ["Le blocus de Berlin", "La chute du mur de Berlin (1989)", "La crise de Cuba", "Le discours de Fulton"], bonneReponse: 1, explication: "La chute du mur de Berlin en 1989 symbolise l'effondrement du bloc de l'Est, suivie de la dissolution de l'URSS en 1991." },
+    ];
+
+    const coursStocke = JSON.parse(sessionStorage.getItem('coursGenere') || 'null');
+    const quiz = (coursStocke && Array.isArray(coursStocke.quiz) && coursStocke.quiz.length > 0)
+      ? coursStocke.quiz
+      : quizParDefaut;
+
+    if (coursStocke) {
+      document.getElementById('fil').textContent = `${coursStocke.matiere || ''} · ${coursStocke.niveau || ''}`;
+      const titreApprox = (coursStocke.texteCours || '').split('\n')[0].slice(0, 50) || 'Ton cours';
+      document.getElementById('titre').textContent = `${titreApprox} — Quiz`;
+    }
+
+    let indexQuestion = 0;
+    let bonnesReponses = 0;
+
+    const carteQuestion = document.getElementById('carte-question');
+    const optionsEl = document.getElementById('options');
+    const explicationEl = document.getElementById('explication');
+    const valider = document.getElementById('valider');
+    const fill = document.getElementById('fill');
+    const label = document.getElementById('label');
+    const qNum = document.getElementById('q-num');
+    const qText = document.getElementById('q-text');
+
+    function afficherQuestion() {
+      const q = quiz[indexQuestion];
+      qNum.textContent = `Question ${indexQuestion + 1}`;
+      qText.textContent = q.question;
+      fill.style.width = `${((indexQuestion) / quiz.length) * 100}%`;
+      label.textContent = `Question ${indexQuestion + 1} / ${quiz.length}`;
+
+      optionsEl.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const label = document.createElement('label');
+        label.className = 'option';
+        label.innerHTML = `<input type="radio" name="reponse" value="${i}"> ${opt}`;
+        optionsEl.appendChild(label);
+      });
+      explicationEl.classList.remove('show');
+      explicationEl.textContent = '';
+      valider.textContent = 'Valider ma réponse';
+      valider.onclick = validerReponse;
+    }
+
+    function validerReponse() {
+      const choisie = document.querySelector('#options input:checked');
+      if (!choisie) return;
+      const q = quiz[indexQuestion];
+      const indexChoisi = parseInt(choisie.value, 10);
+      const options = document.querySelectorAll('#options .option');
+
+      options.forEach((opt, i) => {
+        if (i === q.bonneReponse) opt.classList.add('correcte');
+        else if (i === indexChoisi) opt.classList.add('incorrecte');
+        opt.querySelector('input').disabled = true;
+      });
+
+      if (indexChoisi === q.bonneReponse) bonnesReponses++;
+
+      explicationEl.textContent = q.explication;
+      explicationEl.classList.add('show');
+      valider.textContent = indexQuestion < quiz.length - 1 ? 'Question suivante' : 'Voir mon résultat';
+      valider.onclick = questionSuivante;
+    }
+
+    function questionSuivante() {
+      indexQuestion++;
+      if (indexQuestion < quiz.length) {
+        afficherQuestion();
+      } else {
+        afficherResultat();
+      }
+    }
+
+    function afficherResultat() {
+      fill.style.width = '100%';
+      label.textContent = `Terminé — ${bonnesReponses} / ${quiz.length}`;
+      const pct = Math.round((bonnesReponses / quiz.length) * 100);
+      carteQuestion.innerHTML = `
+        <div class="q-num">Résultat</div>
+        <p class="q-text">Tu as eu ${bonnesReponses} bonnes réponses sur ${quiz.length} (${pct}%).</p>
+        <p style="color:var(--ink-soft); font-size:.95rem;">${pct >= 70 ? "Bien joué, ce chapitre est en bonne voie !" : "Ce chapitre mérite encore un peu de révision — n'hésite pas à demander au chatbot."}</p>
+      `;
+      document.querySelector('.actions').innerHTML = `
+        <a href="tableau-de-bord.html" class="cta">Retour au tableau de bord</a>
+        <a href="chatbot.html" class="lien-chatbot">Revoir avec le chatbot →</a>
+      `;
+    }
+
+    afficherQuestion();
+  </script>
+</body>
+</html>

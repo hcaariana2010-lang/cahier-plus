@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cahier+ — Comprends enfin ton cours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F7F5EF;
+    --paper-line: #C7D3EA;
+    --ink: #1F2A44;
+    --ink-soft: #4A5573;
+    --marge: #D64550;
+    --surligneur: #FFD23F;
+    --vert: #4C9A6A;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent, transparent 35px,
+      var(--paper-line) 35px, var(--paper-line) 36px
+    );
+    color: var(--ink);
+    font-family: 'Work Sans', system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+  }
+  .marge {
+    position: fixed;
+    top: 0; bottom: 0; left: 64px;
+    width: 2px;
+    background: var(--marge);
+    opacity: 0.55;
+    z-index: 0;
+  }
+  header, main, footer { position: relative; z-index: 1; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 32px 28px 96px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .logo {
+    font-family: 'Kalam', cursive;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--ink);
+  }
+  .logo span { color: var(--marge); }
+  nav a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    margin-left: 28px;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  nav a:hover, nav a:focus-visible { color: var(--ink); }
+  .btn-connect {
+    border: 1.5px solid var(--ink);
+    padding: 8px 18px;
+    border-radius: 4px;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 0 32px 0 96px; }
+  .hero {
+    padding: 48px 0 72px;
+    max-width: 640px;
+  }
+  h1 {
+    font-family: 'Kalam', cursive;
+    font-weight: 700;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    line-height: 1.15;
+    margin: 0 0 24px;
+  }
+  h1 .surligne {
+    background: linear-gradient(to bottom, transparent 55%, var(--surligneur) 55%);
+    padding: 0 2px;
+  }
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin: 0 0 32px;
+  }
+  .cta {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 4px;
+    font-size: 1.05rem;
+  }
+  .cta:hover, .cta:focus-visible { background: var(--ink-soft); }
+  .cta-note { font-size: 0.9rem; color: var(--ink-soft); margin-top: 12px; }
+
+  section { padding: 56px 0; border-top: 1.5px dashed var(--paper-line); }
+  h2 {
+    font-family: 'Kalam', cursive;
+    font-size: 1.8rem;
+    margin: 0 0 40px;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .step { max-width: 300px; }
+  .step-num {
+    font-family: 'Kalam', cursive;
+    font-size: 2.2rem;
+    color: var(--marge);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .step h3 { margin: 0 0 8px; font-size: 1.1rem; }
+  .step p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  .matieres {
+    display: flex; flex-wrap: wrap; gap: 12px;
+  }
+  .matiere {
+    background: #fff;
+    border: 1px solid var(--paper-line);
+    padding: 10px 18px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transform: rotate(var(--r, 0deg));
+  }
+  .matiere:nth-child(2n) { --r: -1deg; }
+  .matiere:nth-child(3n) { --r: 1deg; }
+
+  footer {
+    padding: 40px 0 56px;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    border-top: 1.5px dashed var(--paper-line);
+  }
+
+  @media (max-width: 720px) {
+    .marge { left: 20px; }
+    header { padding: 24px 20px 24px 44px; flex-direction: column; align-items: flex-start; gap: 16px; }
+    nav a { margin-left: 0; margin-right: 20px; }
+    main { padding: 0 20px 0 44px; }
+    .steps { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+
+  :focus-visible { outline: 2px solid var(--marge); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <div class="marge" aria-hidden="true"></div>
+
+  <header>
+    <div class="logo">Cahier<span>+</span></div>
+    <nav>
+      <a href="#comment-ca-marche">Comment ça marche</a>
+      <a href="#matieres">Matières</a>
+      <a href="#" class="btn-connect">Se connecter</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" style="border-top:none; padding-top:24px;">
+      <h1>Comprends enfin<br><span class="surligne">ton cours</span>, tout seul.</h1>
+      <p>Dépose le cours qui te bloque. L'IA l'organise, te fait réviser avec des quiz adaptés, et répond à tes questions — comme un prof particulier, gratuitement.</p>
+      <a href="#" class="cta">Ajouter mon premier cours</a>
+      <div class="cta-note">Aucune carte bancaire. Ça prend deux minutes.</div>
+    </section>
+
+    <section id="comment-ca-marche">
+      <h2>Comment ça marche</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Tu déposes ton cours</h3>
+          <p>Colle un texte, envoie un PDF, ou prends en photo tes notes.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>L'IA l'organise</h3>
+          <p>Résumé clair, points clés, et un parcours de révision adapté à ton niveau.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Tu révises et tu poses tes questions</h3>
+          <p>Quiz, exercices corrigés, et un chatbot qui connaît ton cours pour t'expliquer ce qui coince.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="matieres">
+      <h2>Toutes les matières du lycée</h2>
+      <div class="matieres">
+        <span class="matiere">Mathématiques</span>
+        <span class="matiere">Français</span>
+        <span class="matiere">Histoire-Géo</span>
+        <span class="matiere">SVT</span>
+        <span class="matiere">Physique-Chimie</span>
+        <span class="matiere">Philosophie</span>
+        <span class="matiere">SES</span>
+        <span class="matiere">Langues</span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div style="max-width:1100px; margin:0 auto;">Cahier+ — fait pour t'aider à réussir, quels que soient tes moyens.</div>
+  </footer>
+</body>
+</html>
